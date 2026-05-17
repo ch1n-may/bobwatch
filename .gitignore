@@ -32,8 +32,7 @@ yarn-error.log*
 # vercel
 .vercel
 
-# bob session files (contain sensitive data and API keys)
-bob_sessions/
+# bob internal files
 .bob/
 
 # typescript
