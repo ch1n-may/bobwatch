@@ -176,15 +176,15 @@ export async function POST(request) {
     // Build analysis prompt
     const prompt = buildAnalysisPrompt(filePath, fileContent, fileType);
 
-    // Call Gemini 2.5 Flash API
+    // Call Gemini API (using gemini-2.5-flash for consistency)
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.5-flash',
       generationConfig: {
         temperature: 0.3,
         topP: 0.95,
         topK: 40,
-        maxOutputTokens: 16384,
+        maxOutputTokens: 8192,
       }
     });
 

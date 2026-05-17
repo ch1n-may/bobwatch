@@ -27,9 +27,14 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env.local
 
 # vercel
 .vercel
+
+# bob session files (contain sensitive data and API keys)
+bob_sessions/
+.bob/
 
 # typescript
 *.tsbuildinfo

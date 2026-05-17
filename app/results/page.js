@@ -451,21 +451,24 @@ export default function Results() {
     const targetScore = Math.min(data.score + scoreBoost, 100);
     const duration = 2000;
     const steps = 60;
-    const increment = (targetScore - animatedScore) / steps;
-    let current = animatedScore;
+    const startScore = animatedScore;
+    const increment = (targetScore - startScore) / steps;
+    let currentStep = 0;
 
     const timer = setInterval(() => {
-      current += increment;
-      if (current >= targetScore) {
-        setAnimatedScore(targetScore);
+      currentStep++;
+      const newScore = startScore + (increment * currentStep);
+      
+      if (currentStep >= steps) {
+        setAnimatedScore(Math.round(targetScore));
         clearInterval(timer);
       } else {
-        setAnimatedScore(Math.floor(current));
+        setAnimatedScore(Math.round(newScore));
       }
     }, duration / steps);
 
     return () => clearInterval(timer);
-  }, [data, scoreBoost, animatedScore]);
+  }, [data, scoreBoost]);
 
   // Stagger card animations when data is loaded
   useEffect(() => {
@@ -811,16 +814,30 @@ export default function Results() {
                   
                   {/* Dynamic Alert Banner for MCP Exploits */}
                   {governanceStatus === 'FAULT' && mcpVulnerabilities.length > 0 && (
-                    <div className="mt-3 p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
-                      <p className="text-orange-400 font-semibold text-sm mb-2">
-                        ⚠️ COMPLIANCE FAULT: OVER-PERMISSIONED AGENT RECOGNIZED
-                      </p>
-                      <p className="text-text/70 text-xs mb-3">
-                        Detected {mcpVulnerabilities.length} MCP infrastructure {mcpVulnerabilities.length === 1 ? 'vulnerability' : 'vulnerabilities'} with dangerous 'Auto-Approve' capabilities
-                      </p>
+                    <div className="mt-3 p-4 bg-gradient-to-br from-orange-500/10 to-red-500/5 border border-orange-500/40 rounded-lg shadow-lg">
+                      {/* Main Alert Text with Pulsing Icon */}
+                      <div className="flex items-start gap-3 mb-4">
+                        <span className="text-orange-400 text-xl animate-pulse">⚠️</span>
+                        <p className="text-orange-400 font-bold text-base leading-tight animate-pulse">
+                          COMPLIANCE FAULT: OVER-PERMISSIONED AGENT RECOGNIZED
+                        </p>
+                      </div>
+                      
+                      {/* Sub-metrics Breakdown List */}
+                      <div className="space-y-2 mb-4 pl-8">
+                        <p className="text-slate-400 text-sm leading-relaxed">
+                          • Threat Vector: Model Context Protocol (MCP) Confused Deputy
+                        </p>
+                        <p className="text-slate-400 text-sm leading-relaxed">
+                          • Instruction Boundary Condition: FAILED
+                        </p>
+                        <p className="text-slate-400 text-sm leading-relaxed">
+                          • Risk Assessment Profile: High-Risk Shell Execution Layer Detected
+                        </p>
+                      </div>
                       
                       {/* Vulnerability Details */}
-                      <div className="space-y-2 mb-3 max-h-32 overflow-y-auto custom-scrollbar">
+                      <div className="space-y-2 mb-4 max-h-32 overflow-y-auto custom-scrollbar">
                         {mcpVulnerabilities.map((vuln, idx) => (
                           <div key={idx} className="text-xs text-text/60 bg-background/50 p-2 rounded border border-border/50">
                             <span className="font-mono text-orange-400">{vuln.filename}</span>
@@ -833,10 +850,10 @@ export default function Results() {
                       <button
                         onClick={() => handleGovernanceAutoFix(mcpVulnerabilities[0])}
                         disabled={remediatingGovernance}
-                        className={`w-full px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                        className={`w-full px-4 py-3 rounded-lg font-medium text-sm transition-all duration-200 ${
                           remediatingGovernance
                             ? 'bg-accent/50 text-white/50 cursor-not-allowed'
-                            : 'bg-accent text-white hover:bg-accent/90 hover:shadow-lg'
+                            : 'bg-accent text-white hover:bg-accent/90 hover:shadow-lg hover:scale-[1.02]'
                         }`}
                       >
                         {remediatingGovernance ? (

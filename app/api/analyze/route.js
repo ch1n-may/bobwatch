@@ -152,7 +152,12 @@ function generatePresentationData(userIntent, prData) {
     }
   );
   
+  // Calculate a realistic score based on the presentation data
+  // Score formula: 100 - (risky * 20) - (collateral * 5)
+  const calculatedScore = Math.max(1, Math.min(100, 100 - (riskyFiles.length * 20) - (collateralFiles.length * 5)));
+  
   return {
+    score: calculatedScore,
     risky: riskyFiles,
     collateral: collateralFiles,
     intended: primaryFiles
@@ -177,9 +182,10 @@ Analyze this code diff against the developer's stated intent. Classify ALL code 
 3. **RISKY** - Changes that introduce security vulnerabilities, prompt injections, exposed secrets, authentication bypasses, or dangerous deviations from intent
 
 CRITICAL REQUIREMENTS:
+- MUST provide a "score" field as an integer between 1 and 100 (NEVER 0, NEVER null, NEVER undefined)
+- Score calculation: 100 = perfect intent match, 90-99 = minor collateral, 70-89 = some collateral, 50-69 = significant drift, <50 = major security issues
 - For RISKY items: Identify the specific threat type (see THREAT TAXONOMY below)
 - For RISKY items: Generate clean, secure "remediatedCode" that fixes the vulnerability while maintaining functionality
-- Provide an overall "score" out of 100 based on intent alignment (100 = perfect match, 0 = complete drift)
 - Be thorough but concise in explanations
 
 🚨 **MCP INFRASTRUCTURE VULNERABILITY DETECTION (MAY 2026 FOCUS):**
@@ -239,6 +245,12 @@ OUTPUT FORMAT (STRICT JSON ONLY - NO MARKDOWN, NO EXPLANATIONS):
   ]
 }
 
+MANDATORY FIELDS:
+- "score": MUST be an integer between 1-100 (REQUIRED, NEVER omit)
+- "risky": MUST be an array (can be empty [])
+- "collateral": MUST be an array (can be empty [])
+- "intended": MUST be an array (can be empty [])
+
 RESPOND WITH ONLY THE JSON OBJECT. NO ADDITIONAL TEXT.`.trim();
 }
 
@@ -262,9 +274,10 @@ YOUR TASK:
    - **RISKY** - Security vulnerabilities, prompt injections, exposed secrets, auth bypasses, dangerous deviations
 
 CRITICAL REQUIREMENTS:
+- MUST provide a "score" field as an integer between 1 and 100 (NEVER 0, NEVER null, NEVER undefined)
+- Score calculation: 100 = perfect intent match, 90-99 = minor collateral, 70-89 = some collateral, 50-69 = significant drift, <50 = major security issues
 - For RISKY items: Identify specific threat type (see THREAT TAXONOMY below)
 - For RISKY items: Generate clean, secure "remediatedCode" that fixes the vulnerability while maintaining functionality
-- Provide overall "score" out of 100 based on intent alignment (100 = perfect match, 0 = complete drift)
 - Be thorough but concise in explanations
 
 🚨 **MCP INFRASTRUCTURE VULNERABILITY DETECTION (MAY 2026 FOCUS):**
@@ -324,6 +337,12 @@ OUTPUT FORMAT (STRICT JSON ONLY - NO MARKDOWN, NO EXPLANATIONS):
   ]
 }
 
+MANDATORY FIELDS:
+- "score": MUST be an integer between 1-100 (REQUIRED, NEVER omit)
+- "risky": MUST be an array (can be empty [])
+- "collateral": MUST be an array (can be empty [])
+- "intended": MUST be an array (can be empty [])
+
 RESPOND WITH ONLY THE JSON OBJECT. NO ADDITIONAL TEXT.`.trim();
 }
 
@@ -331,15 +350,35 @@ RESPOND WITH ONLY THE JSON OBJECT. NO ADDITIONAL TEXT.`.trim();
 function calculateTRDScore(aiResponse) {
   // If AI provided a score, use it (with validation)
   if (aiResponse.score !== undefined && typeof aiResponse.score === 'number') {
-    return Math.max(0, Math.min(100, Math.round(aiResponse.score)));
+    const validatedScore = Math.max(0, Math.min(100, Math.round(aiResponse.score)));
+    console.log(`✅ Using AI-provided score: ${validatedScore}`);
+    return validatedScore;
   }
   
   // Fallback calculation if AI didn't provide score
-  const { risky, collateral } = aiResponse;
-  let score = 100;
-  score -= (risky.length * 20);
-  score -= (collateral.length * 5);
-  return Math.max(0, Math.min(100, score));
+  const { risky = [], collateral = [], intended = [] } = aiResponse;
+  
+  // Calculate score based on file distribution
+  const totalFiles = risky.length + collateral.length + intended.length;
+  
+  if (totalFiles === 0) {
+    console.warn('⚠️ No files in analysis, defaulting to score 50');
+    return 50; // Neutral score if no files analyzed
+  }
+  
+  // NEW SCORING: 1% for every risky file that has remediatedCode (fixed)
+  // Count risky files that have remediation code
+  const remediatedCount = risky.filter(item => item.remediatedCode && item.remediatedCode.trim().length > 0).length;
+  
+  // Base score starts at 1%, then add 1% for each remediated vulnerability
+  let score = 1 + remediatedCount;
+  
+  // Cap at 100%
+  const finalScore = Math.min(100, score);
+  
+  console.log(`📊 Calculated fallback score: ${finalScore}% (${remediatedCount} remediated out of ${risky.length} risky files)`);
+  
+  return finalScore;
 }
 
 export async function POST(request) {
@@ -574,15 +613,21 @@ export async function POST(request) {
     // Calculate TRD score (preserving exact scoring mathematics)
     const score = calculateTRDScore(aiResponse);
 
+    // Validate and ensure all required fields are present with correct types
+    const validatedData = {
+      score: typeof score === 'number' && score > 0 ? score : 50, // Fallback to 50 if invalid
+      risky: Array.isArray(aiResponse.risky) ? aiResponse.risky : [],
+      collateral: Array.isArray(aiResponse.collateral) ? aiResponse.collateral : [],
+      intended: Array.isArray(aiResponse.intended) ? aiResponse.intended : []
+    };
+
+    console.log(`📊 Final validated score: ${validatedData.score}`);
+    console.log(`📋 File counts - Risky: ${validatedData.risky.length}, Collateral: ${validatedData.collateral.length}, Intended: ${validatedData.intended.length}`);
+
     // Return response preserving exact frontend state configurations and sessionStorage keys
     return NextResponse.json({
       status: 'success',
-      data: {
-        score,
-        risky: aiResponse.risky,
-        collateral: aiResponse.collateral,
-        intended: aiResponse.intended
-      }
+      data: validatedData
     });
 
   } catch (error) {
@@ -600,14 +645,17 @@ export async function POST(request) {
         const fallbackResponse = generatePresentationData(userIntent, prData);
         const score = calculateTRDScore(fallbackResponse);
         
+        // Validate fallback data
+        const validatedData = {
+          score: typeof score === 'number' && score > 0 ? score : 50,
+          risky: Array.isArray(fallbackResponse.risky) ? fallbackResponse.risky : [],
+          collateral: Array.isArray(fallbackResponse.collateral) ? fallbackResponse.collateral : [],
+          intended: Array.isArray(fallbackResponse.intended) ? fallbackResponse.intended : []
+        };
+        
         return NextResponse.json({
           status: 'success',
-          data: {
-            score,
-            risky: fallbackResponse.risky,
-            collateral: fallbackResponse.collateral,
-            intended: fallbackResponse.intended
-          }
+          data: validatedData
         });
       }
     } catch (fallbackError) {

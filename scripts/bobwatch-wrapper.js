@@ -50,10 +50,27 @@ class BobWatchWrapper {
       // Initialize analysis client
       this.analysisClient = new AnalysisClient(this.config);
 
-      // Check if analysis endpoint is available
-      const health = await this.analysisClient.getHealth();
-      if (!health.available) {
-        console.error('[BobWatch] ❌ Analysis endpoint not available!');
+      // Wait for analysis endpoint to be available (with retries)
+      console.log('[BobWatch] ⏳ Waiting for Next.js dev server...');
+      const maxRetries = 30; // 30 attempts
+      const retryDelay = 2000; // 2 seconds
+      let endpointReady = false;
+
+      for (let i = 0; i < maxRetries; i++) {
+        const health = await this.analysisClient.getHealth();
+        if (health.available) {
+          endpointReady = true;
+          console.log('[BobWatch] ✅ Next.js dev server is ready');
+          break;
+        }
+        
+        if (i < maxRetries - 1) {
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
+      }
+
+      if (!endpointReady) {
+        console.error('[BobWatch] ❌ Analysis endpoint not available after waiting!');
         console.error('[BobWatch] 💡 Make sure Next.js dev server is running: npm run dev');
         process.exit(1);
       }
