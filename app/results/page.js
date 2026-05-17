@@ -448,10 +448,13 @@ export default function Results() {
   useEffect(() => {
     if (!data) return;
 
+    // Reset animated score to 0 when new data is loaded
+    setAnimatedScore(0);
+
     const targetScore = Math.min(data.score + scoreBoost, 100);
     const duration = 2000;
     const steps = 60;
-    const startScore = animatedScore;
+    const startScore = 0; // Always start from 0 for new data
     const increment = (targetScore - startScore) / steps;
     let currentStep = 0;
 
