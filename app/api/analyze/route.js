@@ -153,8 +153,8 @@ function generatePresentationData(userIntent, prData) {
   );
   
   // Calculate a realistic score based on the presentation data
-  // Score formula: 100 - (risky * 20) - (collateral * 5)
-  const calculatedScore = Math.max(1, Math.min(100, 100 - (riskyFiles.length * 20) - (collateralFiles.length * 5)));
+  // Score formula: 100 - (risky * 15) - (collateral * 5)
+  const calculatedScore = Math.max(1, Math.min(100, 100 - (riskyFiles.length * 15) - (collateralFiles.length * 5)));
   
   return {
     score: calculatedScore,
@@ -366,17 +366,17 @@ function calculateTRDScore(aiResponse) {
     return 50; // Neutral score if no files analyzed
   }
   
-  // NEW SCORING: 1% for every risky file that has remediatedCode (fixed)
-  // Count risky files that have remediation code
-  const remediatedCount = risky.filter(item => item.remediatedCode && item.remediatedCode.trim().length > 0).length;
+  // Calculate score based on intent alignment
+  // Formula: Start at 100%, subtract penalties for risky and collateral files
+  const riskyPenalty = risky.length * 15; // 15% penalty per risky file
+  const collateralPenalty = collateral.length * 5; // 5% penalty per collateral file
   
-  // Base score starts at 1%, then add 1% for each remediated vulnerability
-  let score = 1 + remediatedCount;
+  let score = 100 - riskyPenalty - collateralPenalty;
   
-  // Cap at 100%
-  const finalScore = Math.min(100, score);
+  // Ensure score stays within 1-100 range
+  const finalScore = Math.max(1, Math.min(100, score));
   
-  console.log(`📊 Calculated fallback score: ${finalScore}% (${remediatedCount} remediated out of ${risky.length} risky files)`);
+  console.log(`📊 Calculated fallback score: ${finalScore}% (Risky: ${risky.length}, Collateral: ${collateral.length}, Intended: ${intended.length})`);
   
   return finalScore;
 }
