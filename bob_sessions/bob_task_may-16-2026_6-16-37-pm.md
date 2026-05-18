@@ -123,7 +123,7 @@ Let me check your current `.env.local` file to understand the situation:
 <content lines="1-3">
 1 | # Gemini API Key
 2 | # Get your API key from: https://aistudio.google.com/app/apikey
-3 | GEMINI_API_KEY=AIzaSyDctN4SAwehjfwONvcdp6xFEP73EW8P-NQ
+3 | GEMINI_API_KEY=[REDACTED_API_KEY]
 </content>
 </file>
 </files>
@@ -170,7 +170,7 @@ The error message is clear:
 ```
 
 **Root Cause:**
-Your Gemini API key (`AIzaSyDctN4SAwehjfwONvcdp6xFEP73EW8P-NQ`) has been exposed publicly and Google has disabled it for security reasons.
+Your Gemini API key (`[REDACTED_API_KEY]`) has been exposed publicly and Google has disabled it for security reasons.
 
 **Solution:**
 1. **Generate a new API key** at https://aistudio.google.com/app/apikey
@@ -248,7 +248,7 @@ You have not created a todo list yet. Create one with `update_todo_list` if your
 <content lines="1-3">
 1 | # Gemini API Key
 2 | # Get your API key from: https://aistudio.google.com/app/apikey
-3 | GEMINI_API_KEY=AIzaSyDctN4SAwehjfwONvcdp6xFEP73EW8P-NQ
+3 | GEMINI_API_KEY=[REDACTED_API_KEY]
 </content>
 </file>
 </files>

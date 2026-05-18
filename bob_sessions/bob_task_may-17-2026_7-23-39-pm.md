@@ -638,7 +638,7 @@ I'll test the wrapper by checking if there's a test file with vulnerabilities, o
  8 |  */
  9 | 
 10 | // VULNERABILITY 1: Exposed Secret
-11 | const API_KEY = "sk-1234567890abcdefghijklmnopqrstuvwxyz";
+11 | const API_KEY = "[REDACTED_OPENAI_KEY]";
 12 | const DATABASE_PASSWORD = "admin123";
 13 | 
 14 | // VULNERABILITY 2: SQL Injection
@@ -3903,7 +3903,7 @@ The wrapper is working perfectly - it detected the file change! However, the Gem
 3 | 
 4 | # Google Gemini API Key
 5 | # Get your API key from: https://aistudio.google.com/app/apikey
-6 | GEMINI_API_KEY=AIzaSyASbYUL1Z8mHQAhQFNlad5zwTSSVxB6i3k
+6 | GEMINI_API_KEY=[REDACTED_API_KEY]
 7 | 
 8 | # Presentation Mode (set to 'true' for demo mode, 'false' for live API calls)
 9 | PRESENTATION_MODE=false
@@ -4230,7 +4230,7 @@ The error message says to "Call ModelService.ListModels to see the list of avail
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 async function listModels() {
-  const apiKey = 'AIzaSyASbYUL1Z8mHQAhQFNlad5zwTSSVxB6i3k';
+  const apiKey = '[REDACTED_API_KEY]';
   const genAI = new GoogleGenerativeAI(apiKey);
   
   try {

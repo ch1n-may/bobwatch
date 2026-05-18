@@ -4442,7 +4442,7 @@ npm run dev
 
 New instructions for task continuation:
 <user_message>
-AIzaSyDctN4SAwehjfwONvcdp6xFEP73EW8P-NQ   this is the api key test if it works
+[REDACTED_API_KEY]   this is the api key test if it works
 </user_message>
 <environment_details>
 # VSCode Visible Files
@@ -4539,7 +4539,7 @@ GEMINI_API_KEY=your_gemini_api_key_here
 =======
 # Gemini API Key
 # Get your API key from: https://aistudio.google.com/app/apikey
-GEMINI_API_KEY=AIzaSyDctN4SAwehjfwONvcdp6xFEP73EW8P-NQ
+GEMINI_API_KEY=[REDACTED_API_KEY]
 >>>>>>> REPLACE
 </diff>
 </apply_diff>
@@ -5729,7 +5729,7 @@ Let me create a script to list available models first:
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const listModels = async () => {
-  const apiKey = 'AIzaSyDctN4SAwehjfwONvcdp6xFEP73EW8P-NQ';
+  const apiKey = '[REDACTED_API_KEY]';
   const genAI = new GoogleGenerativeAI(apiKey);
   
   console.log('🔍 Fetching available Gemini models...\n');
@@ -6299,7 +6299,7 @@ The issue is that the API key might be for a different version or the models are
 const fetch = require('node-fetch');
 
 const testGemini = async () => {
-  const apiKey = 'AIzaSyDctN4SAwehjfwONvcdp6xFEP73EW8P-NQ';
+  const apiKey = '[REDACTED_API_KEY]';
   
   console.log('🧪 Testing Gemini API directly...\n');
   

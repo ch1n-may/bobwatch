@@ -546,7 +546,7 @@ I'll help you upgrade the backend route to a fully operational, production-grade
 <content lines="1-3">
 1 | # Gemini API Key
 2 | # Get your API key from: https://aistudio.google.com/app/apikey
-3 | GEMINI_API_KEY=AIzaSyD7hlcsCZe_JLoDgsWMYukQzIaIhkvv-EQ
+3 | GEMINI_API_KEY=[REDACTED_API_KEY]
 </content>
 </file>
 <file><path>test-presentation.json</path>
@@ -2481,11 +2481,11 @@ Excellent! The backend has been successfully upgraded. Now let me update the `.e
 -------
 # Gemini API Key
 # Get your API key from: https://aistudio.google.com/app/apikey
-GEMINI_API_KEY=AIzaSyD7hlcsCZe_JLoDgsWMYukQzIaIhkvv-EQ
+GEMINI_API_KEY=[REDACTED_API_KEY]
 =======
 # Gemini API Key
 # Get your API key from: https://aistudio.google.com/app/apikey
-GEMINI_API_KEY=AIzaSyD7hlcsCZe_JLoDgsWMYukQzIaIhkvv-EQ
+GEMINI_API_KEY=[REDACTED_API_KEY]
 
 # Presentation Mode
 # Set to 'true' for demo mode (bypasses GitHub API and uses mock data)
