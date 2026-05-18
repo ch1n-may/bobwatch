@@ -263,7 +263,7 @@ The `/bob_sessions` directory contains **complete, unedited logs** of every conv
 Built by two engineering students from Bangalore who shipped BobWatch in 24 hours using IBM Bob:
 
 - **Chinmay** - Full-stack development, AI integration, security research
-- **Partner** - Architecture, deployment, testing, documentation
+- **Lahar** - Architecture, deployment, testing, documentation
 
 ### Hackathon Stats
 - **Event:** IBM Bob Hackathon 2026
